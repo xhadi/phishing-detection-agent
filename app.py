@@ -46,8 +46,12 @@ if input_type == "Email":
     subject = st.text_input("Subject:")
     body = st.text_area("Body:", height=200)
     if sender or subject or body:
-        # Note the exact spacing to match the training set concatenation
-        user_input = f"From: {sender}  Subject: {subject}  Body: {body}"
+            # Fill empty fields with 'nan' to match the training data
+            sender = sender if sender else "nan"
+            subject = subject if subject else "nan"
+            
+            # Note the exact spacing to match the training set concatenation
+            user_input = f"From: {sender}  Subject: {subject}  Body: {body}"
 else:
     user_input = st.text_area("Enter the SMS text here:", height=200)
 if st.button("Analyze"):
@@ -119,12 +123,12 @@ if st.button("Analyze"):
             word_lower = word.lower()
             if word_lower in word_importance:
                 imp = word_importance[word_lower]
-                # Lower threshold for embeddings, which distribute weights more broadly
-                threshold = 0.01  
+                # Lower threshold to catch smaller drops
+                threshold = 0.005  
                 
                 if imp > threshold:
-                    # scale intensity up to a max drop of 0.15 (15%)
-                    intensity = min(1.0, imp / 0.15)
+                    # scale intensity up to a max drop of 0.35
+                    intensity = min(1.0, imp / 0.35)
                     return f'<span style="background-color: rgba(255, 0, 0, {intensity}); padding: 2px; border-radius: 4px; color: white;">{word}</span>'
             return word
 
