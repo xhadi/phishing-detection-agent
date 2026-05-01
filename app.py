@@ -38,7 +38,17 @@ except Exception as e:
     st.stop()
 
 # GUI interface
-user_input = st.text_area("Enter the message or email content here:", height=300)
+input_type = st.radio("Select Message Type:", ["Email", "SMS"])
+
+user_input = ""
+if input_type == "Email":
+    sender = st.text_input("Sender (From):")
+    subject = st.text_input("Subject:")
+    body = st.text_area("Body:", height=200)
+    if sender or subject or body:
+        user_input = f"From: {sender} Subject: {subject} Body: {body}"
+else:
+    user_input = st.text_area("Enter the SMS text here:", height=200)
 if st.button("Analyze"):
     if user_input.strip() == "":
         st.warning("Please enter some text to analyze.")
