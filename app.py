@@ -82,52 +82,49 @@ if st.button("Analyze"):
 
         # --- Explainability Feature: Highlighting Key Words ---
         st.write("### Analysis Breakdown:")
-        st.write("Highlighted words indicate their contribution to the model's decision.")
+        st.write("Highlighted words indicate their contribution to the predicted class. Red highlights push the model *towards* this prediction.")
         
         # Display the Legend
         st.markdown("""
         <div style="display: flex; gap: 15px; margin-bottom: 20px; font-size: 14px;">
             <div style="display: flex; align-items: center; gap: 5px;">
-                <span style="background-color: rgba(255, 0, 0, 1.0); width: 15px; height: 15px; border-radius: 3px;"></span> Strong Phishing
+                <span style="background-color: rgba(255, 0, 0, 0.8); width: 15px; height: 15px; border-radius: 3px;"></span> Strong Indicator
             </div>
             <div style="display: flex; align-items: center; gap: 5px;">
-                <span style="background-color: rgba(255, 0, 0, 0.4); width: 15px; height: 15px; border-radius: 3px;"></span> Weak Phishing
-            </div>
-            <div style="display: flex; align-items: center; gap: 5px;">
-                <span style="background-color: rgba(0, 255, 0, 1.0); width: 15px; height: 15px; border-radius: 3px;"></span> Strong Legitimate
-            </div>
-            <div style="display: flex; align-items: center; gap: 5px;">
-                <span style="background-color: rgba(0, 255, 0, 0.4); width: 15px; height: 15px; border-radius: 3px;"></span> Weak Legitimate
+                <span style="background-color: rgba(255, 0, 0, 0.3); width: 15px; height: 15px; border-radius: 3px;"></span> Weak Indicator
             </div>
         </div>
         """, unsafe_allow_html=True)
         
-        # The coefficients mapped to feature indices
-        coefs = model.coef_[0]
-        vocab = vectorizer.vocabulary_
+        words = re.findall(r'\b\w+\b', user_input)
+        unique_words = set(words)
         
-        # Function to highlight words
-        def highlight_words(match):
+        word_importance = {}
+        for word in unique_words:
+            # Create text without this word (using regex to remove whole word)
+            text_without_word = re.sub(r'\b' + re.escape(word) + r'\b', '', user_input, flags=re.IGNORECASE)
+            
+            # Predict probability of the original predicted class WITHOUT this word
+            vec_without = embedder.encode([text_without_word])
+            prob_without = model.predict_proba(vec_without)[0][prediction]
+            
+            # Importance = Baseline Prob - Prob Without Word
+            # If positive, the word INCREASES the probability (it's an indicator)
+            importance = predicted_probability - prob_without
+            word_importance[word.lower()] = importance
+
+        def highlight_words_new(match):
             word = match.group(0)
             word_lower = word.lower()
-            if word_lower in vocab:
-                idx = vocab[word_lower]
-                weight = coefs[idx]
+            if word_lower in word_importance:
+                imp = word_importance[word_lower]
+                threshold = 0.05  # minimum 5% probability drop to highlight
                 
-                # Highlight if weight strongly pushes to Phishing (positive) or Legitimate (negative)
-                # You can adjust the threshold (e.g., 0.2) based on how much you want to highlight
-                threshold = 0.2
-                if weight > threshold:
-                    intensity = min(1.0, weight / 4.0)  # scale for color intensity
+                if imp > threshold:
+                    # scale intensity up to a max drop of 0.3 (30%)
+                    intensity = min(1.0, imp / 0.3)
                     return f'<span style="background-color: rgba(255, 0, 0, {intensity}); padding: 2px; border-radius: 4px; color: white;">{word}</span>'
-                elif weight < -threshold:
-                    intensity = min(1.0, abs(weight) / 4.0)
-                    return f'<span style="background-color: rgba(0, 255, 0, {intensity}); padding: 2px; border-radius: 4px; color: black;">{word}</span>'
             return word
 
-        # Replace words in original text while preserving structure
-        highlighted_text = re.sub(r'\b\w+\b', highlight_words, user_input)
-        
-        # Display the custom HTML 
-        # (Replacing newlines with HTML line breaks to maintain email formatting)
+        highlighted_text = re.sub(r'\b\w+\b', highlight_words_new, user_input)
         st.markdown(f"<div style='line-height:1.6;'>{highlighted_text.replace(chr(10), '<br>')}</div>", unsafe_allow_html=True)
