@@ -1,45 +1,50 @@
-# 🔍 Phishing Detection Agent
+# 🔍 Enterprise Phishing Detection Agent (Hybrid Architecture)
 
-The **Phishing Detection Agent** is a machine learning-based tool designed to analyze email and message content to predict whether it is a phishing attempt or a legitimate message. It includes an interactive web interface that provides transparency on the model's decision-making process.
+The **Phishing Detection Agent** is an enterprise-grade Threat Intelligence tool designed to intercept and classify modern cyber threats across both Email and SMS channels. 
 
-## ✨ Features
-- **High Accuracy Classification:** Trained using Scikit-Learn to detect malicious patterns in text data.
-- **Visual Explainability (XAI):** The web app highlights specific words in your text that influenced the model's prediction:
-  - **Red Highlight:** Words associated with Phishing attempts.
-  - **Green Highlight:** Words associated with Legitimate correspondence.
-  - Includes a legend denoting the strength (transparency/intensity) of the word's influence.
-- **Open Source Data:** Includes free and open-source datasets (`phishing_email.csv` and `phishing_sms.csv`) used to train the model, making it reproducible for everyone.
+Moving beyond basic keyword matching, this agent utilizes a **Hybrid AI Architecture**—combining dense semantic vector embeddings with explicit structural feature engineering to detect psychological manipulation, credential harvesting, and MFA bypass attempts. 
+
+## ✨ Core Architecture & Features
+- **Hybrid XGBoost Engine:** Fuses 384-dimensional semantic text vectors (via `all-MiniLM-L6-v2`) with custom structural logic (URL presence, message length, and urgency vocabulary) to identify sophisticated threats.
+- **4-Class Threat Matrix:** Streamlined for enterprise Security Operations Centers (SOC). The model classifies inputs strictly into: `Safe Email`, `Safe SMS`, `Phishing Email`, and `Malicious SMS`.
+- **Application-Layer Routing:** Enforces logical UI constraints on top of machine learning outputs to ensure the predicted threat matches the user's selected delivery channel.
+- **Human-in-the-Loop (HITL):** Automatically detects edge cases. If threat confidence falls below 75%, the system intercepts the message and flags it for manual analyst review.
+- **Explainable AI (XAI):** The interface mathematically calculates and highlights the exact words that triggered the threat detection, providing transparency into the model's psychological analysis. 
 
 ## 🛠️ Technology Stack
-- **Python 3.x**
-- **Scikit-Learn:** Text vectorization (`TfidfVectorizer`) and ML prediction (`LogisticRegression`).
-- **Pandas & Matplotlib:** Data loading, manipulation, and visualization (e.g., Confusion Matrix).
-- **Streamlit:** Interactive, dark-themed web interface.
+- **Machine Learning:** `XGBoost` (Classification) and `Scikit-Learn` (Metrics/Weighting).
+- **Natural Language Processing (NLP):** `sentence-transformers` (all-MiniLM-L6-v2) for contextual text embeddings.
+- **Data Engineering:** `Pandas`, `NumPy`, and `PyArrow` for processing large-scale Parquet files and CSV fusions.
+- **Frontend/UI:** `Streamlit` for the dark-themed, interactive analysis portal.
 
 ## 🚀 Getting Started
 
 ### 1. Install Dependencies
-Make sure you have Python installed. Then, install the required packages:
+Ensure you have Python 3.8+ installed. Install the required data and ML packages:
 ```bash
-pip install pandas scikit-learn matplotlib streamlit
+pip install -r requirements.txt
 ```
 
-### 2. Train the Model
-The repository includes a Jupyter Notebook ready for you to train the ML pipeline from scratch. 
-1. Open `train_model.ipynb`.
-2. Run all the cells. This will process the `phishing_email.csv` and `phishing_sms.csv` files, train the model, display evaluation metrics, and generate two required files:
-   - `phishing_model.pkl` (The trained Logistic Regression model)
-   - `vectorizer.pkl` (The TF-IDF vectorizer)
-
-### 3. Run the Detection App
-Once the model is trained and saved, you can spin up the Streamlit web application by running:
+If you prefer a single command instead of a requirements file, run:
 ```bash
-streamlit run app.py
+pip install pandas numpy scikit-learn xgboost sentence-transformers streamlit matplotlib pyarrow
 ```
-This will open the Phishing Detection Agent in your default web browser where you can paste emails to be analyzed!
 
-## 📂 Project Structure
-- `app.py`: The Streamlit web application script.
-- `train_model.ipynb`: Jupyter Notebook for training and evaluating the ML model.
-- `phishing_email.csv`: The open-source email dataset used for training.
-- `phishing_sms.csv`: The open-source SMS dataset used for training.
+It's recommended to create and activate a virtual environment before installing dependencies.
+
+Windows (PowerShell):
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+macOS / Linux:
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+After activation, run:
+```bash
+pip install -r requirements.txt
+```
