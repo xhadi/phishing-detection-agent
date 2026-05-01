@@ -1,15 +1,16 @@
 import streamlit as st
 import pickle
 import re
+import pandas as pd
+from sentence_transformers import SentenceTransformer
 
 # function to load the trained model and vectorizer
 @st.cache_resource
 def load_model():
-    with open('phishing_model.pkl', 'rb') as f:
+    with open('threat_model_xgboost.pkl', 'rb') as f:
         model = pickle.load(f)
-    with open('vectorizer.pkl', 'rb') as f:
-        vectorizer = pickle.load(f)
-    return model, vectorizer
+    embedder = SentenceTransformer('all-MiniLM-L6-v2')
+    return model, embedder
 
 # Page configuration
 st.set_page_config(page_title="Phishing Detection Agent", page_icon="🔍")
@@ -29,9 +30,9 @@ st.markdown(
 st.title("Phishing Detection Agent")
 st.write("Enter a message or email below to analyze its probability of being a phishing attempt.")
 
-# Load model and vectorizer
+# Load model and embedder
 try:
-    model, vectorizer = load_model()
+    model, embedder = load_model()
 except Exception as e:
     st.error(f"Error loading model: {e}")
     st.stop()
