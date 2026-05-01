@@ -54,17 +54,31 @@ if st.button("Analyze"):
         st.warning("Please enter some text to analyze.")
     else:
         # Preprocess and vectorize the input
-        input_vector = vectorizer.transform([user_input])
+        input_vector = embedder.encode([user_input])
         
         # Predict using the loaded model
-        prediction = model.predict(input_vector)[0]
-        probability = model.predict_proba(input_vector)[0][1]  # Probability of being phishing
+        prediction = int(model.predict(input_vector)[0])
+        probabilities = model.predict_proba(input_vector)[0]
         
-        # Display results
-        if prediction == 1:
-            st.error(f"⚠️ This message is likely a PHISHING attempt! (Probability: {probability * 100:.2f}%)")
-        else:
-            st.success(f"✅ This message appears to be LEGITIMATE. (Probability of phishing: {probability * 100:.2f}%)")
+        # Map integer labels to string names
+        label_map = {
+            0: 'Safe Email',
+            1: 'Safe SMS',
+            2: 'Spam Email',
+            3: 'Phishing Email',
+            4: 'Malicious SMS'
+        }
+        predicted_class_name = label_map.get(prediction, "Unknown")
+        predicted_probability = probabilities[prediction]
+        
+        # Display results based on predicted class
+        st.write(f"### Predicted Category: **{predicted_class_name}**")
+        st.write(f"**Confidence:** {predicted_probability * 100:.2f}%")
+
+        if prediction in [2, 3, 4]:  # Spam, Phishing, Malicious
+            st.error(f"⚠️ This message is flagged as a THREAT: {predicted_class_name}.")
+        else:  # Safe Email, Safe SMS
+            st.success(f"✅ This message appears to be SAFE: {predicted_class_name}.")
 
         # --- Explainability Feature: Highlighting Key Words ---
         st.write("### Analysis Breakdown:")
