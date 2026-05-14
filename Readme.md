@@ -48,3 +48,25 @@ After activation, run:
 ```bash
 pip install -r requirements.txt
 ```
+
+### 2. Run the Application
+Once the dependencies are installed, you can start the Streamlit interface by running:
+```bash
+streamlit run app.py
+```
+
+### 3. Model Training (Optional)
+If you want to train the model from scratch, the required code and data are provided:
+1. Extract `Datasets.zip` in the root directory.
+2. Open and run all cells in `train_model.ipynb`.
+
+## 📁 Project Structure
+```text
+.
+├── app.py                      # Main Streamlit web application
+├── threat_model_xgboost.pkl    # Pre-trained XGBoost classification model
+├── train_model.ipynb           # Jupyter notebook for training the model
+├── Datasets.zip                # Compressed training data
+├── requirements.txt            # Python dependencies
+└── Readme.md                   # This documentation
+```
