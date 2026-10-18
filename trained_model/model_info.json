@@ -1,0 +1,30 @@
+{
+  "trained_on": "2026-10-18",
+  "embedder": "all-MiniLM-L6-v2",
+  "threshold": 0.5,
+  "near_dup_threshold": 0.9,
+  "email": {
+    "accuracy": 0.9767149150409062,
+    "roc_auc": 0.9972353087941763,
+    "test_size": 1589,
+    "modern_accuracy": 0.8333333333333334,
+    "train_rows": 7415,
+    "n_features": 385,
+    "structural_features": [
+      "urgency_count"
+    ]
+  },
+  "sms": {
+    "accuracy": 0.9709364908503767,
+    "roc_auc": 0.9898964563637532,
+    "test_size": 929,
+    "modern_accuracy": 0.8,
+    "train_rows": 4331,
+    "n_features": 387,
+    "structural_features": [
+      "urgency_count",
+      "has_url",
+      "url_count"
+    ]
+  }
+}
