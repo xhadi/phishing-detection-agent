@@ -1,6 +1,6 @@
 # 🔍 Phishing Detection Agent (Hybrid Architecture)
 
-The **Phishing Detection Agent** is an Threat Intelligence tool designed to intercept and classify modern cyber threats across both Email and SMS channels. 
+The **Phishing Detection Agent** is a Threat Intelligence tool designed to intercept and classify modern cyber threats across both Email and SMS channels. 
 
 Moving beyond basic keyword matching, this agent utilizes a **Hybrid AI Architecture**—combining dense semantic vector embeddings with explicit structural feature engineering to detect psychological manipulation, credential harvesting, and MFA bypass attempts. 
 
