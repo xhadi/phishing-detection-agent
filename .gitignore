@@ -8,12 +8,17 @@ env/
 venv/
 ENV/
 
-# dataset files
+# dataset files (custom.csv and mailbox exports hold personal messages, so they stay ignored)
 *.csv
 *.parquet
+*.mbox
+!dataset/synthetic/*.csv
+!reality_check/*.csv
 
 # Streamlit
 .streamlit/
 
 # VS Code
 .vscode/
+# Local notes (not pushed)
+KNOWN_ISSUES.md

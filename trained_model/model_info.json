@@ -1,30 +1,34 @@
 {
-  "trained_on": "2026-10-18",
+  "trained_on": "2026-10-22",
   "embedder": "all-MiniLM-L6-v2",
   "threshold": 0.5,
+  "window_words": 48,
   "near_dup_threshold": 0.9,
   "email": {
-    "accuracy": 0.9767149150409062,
-    "roc_auc": 0.9972353087941763,
-    "test_size": 1589,
-    "modern_accuracy": 0.8333333333333334,
-    "train_rows": 7415,
+    "accuracy": 0.9668835008870491,
+    "roc_auc": 0.9930328605374033,
+    "test_size": 1691,
+    "modern_accuracy": 0.6333333333333333,
+    "train_rows": 7888,
     "n_features": 385,
     "structural_features": [
       "urgency_count"
-    ]
+    ],
+    "window_threshold": null,
+    "own_inbox_safe_flagged": 0.08783783783783784
   },
   "sms": {
-    "accuracy": 0.9709364908503767,
-    "roc_auc": 0.9898964563637532,
-    "test_size": 929,
-    "modern_accuracy": 0.8,
-    "train_rows": 4331,
+    "accuracy": 0.9670912951167728,
+    "roc_auc": 0.9846323680747425,
+    "test_size": 942,
+    "modern_accuracy": 0.7,
+    "train_rows": 4393,
     "n_features": 387,
     "structural_features": [
       "urgency_count",
       "has_url",
       "url_count"
-    ]
+    ],
+    "window_threshold": null
   }
 }

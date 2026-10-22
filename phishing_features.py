@@ -13,6 +13,10 @@ Design notes (see dataset/README.md for the evidence):
 - Punctuation and case are dropped because Enron text is pre-tokenized and
   lowercase while the other sources are raw; otherwise style reveals the source.
 - Message length is not a feature (it mostly separated SMS from email in v1).
+- One embedding of a long message is dominated by its bulk: a phishing request
+  appended to a long harmless email barely moves it. The optional window scan
+  scores overlapping ~48-word windows with the same model, so one suspicious
+  passage can flag the message (see train_model.ipynb section 10).
 """
 import re
 
@@ -50,6 +54,8 @@ STRUCTURAL_FEATURE_NAMES = {
     'email': ['urgency_count'],
     'sms': ['urgency_count', 'has_url', 'url_count'],
 }
+
+WINDOW_WORDS = 48  # about 64 tokens; windows overlap by half, so any passage of up to 24 words fits whole in one
 
 
 def _check_channel(channel):
@@ -92,6 +98,13 @@ def structural_features(raw_text, channel):
     return features
 
 
+def embedding_dimension(embedder):
+    """Embedding size; sentence-transformers renamed get_sentence_embedding_dimension to get_embedding_dimension."""
+    if hasattr(embedder, 'get_embedding_dimension'):
+        return embedder.get_embedding_dimension()
+    return embedder.get_sentence_embedding_dimension()
+
+
 def build_features(raw_texts, embedder, channel, batch_size=64, show_progress_bar=False):
     """Return the model input matrix: [384 semantic dims | structural features for the channel]."""
     _check_channel(channel)
@@ -104,3 +117,37 @@ def build_features(raw_texts, embedder, channel, batch_size=64, show_progress_ba
     )
     structural = np.array([structural_features(t, channel) for t in raw_texts], dtype=np.float32)
     return np.hstack((vectors, structural))
+
+
+def threat_probabilities(model, embedder, raw_texts, channel, batch_size=64):
+    return model.predict_proba(build_features(raw_texts, embedder, channel, batch_size=batch_size))[:, 1]
+
+
+def text_windows(raw_text, channel, size=WINDOW_WORDS):
+    """Overlapping windows of the cleaned text; empty when the whole message fits in one window.
+
+    Windows are cleaned text, which normalize_text leaves unchanged, so they can be scored like messages.
+    """
+    words = normalize_text(raw_text, channel).split()
+    if len(words) <= size:
+        return []
+    step = size // 2
+    return [' '.join(words[i:i + size]) for i in range(0, len(words) - step, step)]
+
+
+def riskiest_windows(model, embedder, raw_texts, channel, batch_size=64):
+    """For each message, the window with the highest threat probability.
+
+    Returns (probabilities, windows). Messages that fit in one window get probability 0.0 and window None.
+    """
+    windows = [text_windows(t, channel) for t in raw_texts]
+    flat = [w for message_windows in windows for w in message_windows]
+    probs = threat_probabilities(model, embedder, flat, channel, batch_size) if flat else np.array([])
+    best_probs, best_windows = np.zeros(len(windows)), [None] * len(windows)
+    start = 0
+    for i, message_windows in enumerate(windows):
+        if message_windows:
+            j = int(np.argmax(probs[start:start + len(message_windows)]))
+            best_probs[i], best_windows[i] = probs[start + j], message_windows[j]
+        start += len(message_windows)
+    return best_probs, best_windows

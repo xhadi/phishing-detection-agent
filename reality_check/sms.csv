@@ -1,0 +1,61 @@
+label,category,text
+1,delivery_scam,USPS: your package is on hold due to an unpaid fee. Pay now: http://usps-redeliver.top/pay
+1,bank_scam,ALERT: Your bank account has been locked. Verify your details at http://bit.ly/3xYz now
+1,prize,Congratulations! You've won a $1000 Walmart gift card. Claim here before it expires: http://wm-prize.co
+1,billing_scam,Your Netflix payment failed. Update your billing info within 24h to avoid suspension: netflix-billing.info
+1,family_impersonation,"Hi mum, I dropped my phone and this is my new number. Can you send me money for a new one? Urgent"
+1,family_impersonation,"Hey dad it's me, my phone broke so I'm using a friend's. Can you text me back on this number? I need help with something"
+1,family_impersonation,"Mom I'm in trouble, I need $600 for a bill today and my bank app is locked. I'll pay you back tomorrow I promise. Please don't call, I can't talk"
+1,family_impersonation,"Hi mam this is my new number, save it and delete the old one. Are you free? I need a favour"
+1,ceo_fraud,"Hi, it's Mark. I'm stuck in a meeting. I need you to buy 4 Google Play gift cards of $100 each for a client. Send me photos of the codes. Keep it between us"
+1,ceo_fraud,"This is your manager, are you available? I need a quick favour, reply asap"
+1,wrong_number,"Hi, is this Jessica? We met at the wine tasting last month. I finally found your number!"
+1,toll_scam,E-ZPass: you have an unpaid toll balance of $4.15. Pay by today to avoid a $50 late fee: ezpass-tolls.xyz
+1,bank_scam,"Chase: a payment of $1,249.00 to BestBuy was attempted on your card. If this was not you, call our fraud team at 1-833-555-0177"
+1,bank_scam,Wells Fargo: your card has been temporarily suspended. Reply YES to receive a link to reactivate it
+1,account_scam,Apple: your Apple Pay has been suspended. Visit apple-verify-pay.com to restore access
+1,job_scam,"Hello, we are hiring remote part time staff, $300-$800 per day, flexible hours. Contact our HR on WhatsApp to apply"
+1,crypto_scam,Your crypto wallet received 0.21 BTC. Withdraw to your bank before it expires at btc-withdraw.live
+1,tax_scam,IRS: you are eligible for a tax refund of $528. Submit your details to receive it: irs-refund-portal.online
+1,prize,"You have been selected for a free iPhone 16. Reply CLAIM to receive it, only pay shipping"
+1,account_scam,Your Amazon account is on hold because of a billing problem. Confirm your card at amzn-accountcheck.shop
+1,delivery_scam,Evri: we missed you today. Rebook your delivery for a 1.20 GBP fee at evri-rebook.info
+1,loan_scam,"Your loan of $5,000 is pre-approved! No credit check. Reply YES to get the money today"
+1,refund_scam,Your Norton subscription was renewed for $299. To cancel and get a refund call 1-888-555-0161
+1,family_impersonation,"Grandma it's Jake, I'm in jail after a car accident and need bail money. Please don't tell mom. My lawyer will call you"
+1,ceo_fraud,"Hi, this is Linda from the CEO office. Can you handle an urgent task for me today? I will explain by text"
+1,wrong_number,"Sorry to bother you, my assistant gave me this number for the golf club booking. Is this Mr. Chen?"
+1,medicare_scam,"Medicare: your new benefits card is ready. Confirm your SSN to activate it, reply now"
+1,account_scam,WhatsApp: your account will be deleted today. Send us the 6 digit code you just received to keep it
+1,delivery_scam,FedEx: package 7741 has an incorrect address. Update it here fedx-update.click/7741
+1,bank_scam,"HSBC: a new payee was added to your account. If this was NOT you, visit hsbc-cancelpayee.com immediately"
+0,personal,Hey are you coming to the party tonight? bring snacks
+0,otp,Your verification code is 482913. Do not share it with anyone.
+0,personal,"Running 10 min late, order me a coffee please"
+0,appointment,Your appointment with Dr. Smith is confirmed for Tuesday at 3pm. Reply C to cancel.
+0,personal,Happy birthday! Hope you have an amazing day
+0,delivery_link,Your Amazon package was delivered. Track: https://amzn.to/3abcd
+0,delivery_link,Your DoorDash order is on the way! Track it here: https://drd.sh/abc123
+0,otp,Your Uber code is 4821. Never share this code.
+0,appointment,Reminder: dentist appointment tomorrow 9am. Call 555-0101 to reschedule.
+0,otp,G-582013 is your Google verification code.
+0,otp,Your WhatsApp code: 731-224. Don't share this code with others
+0,delivery_link,UPS: your package will be delivered today between 2pm and 6pm. Details: https://www.ups.com/track?tracknum=1Z999
+0,delivery,Your Instacart shopper Maria is at the store and has started your order.
+0,transport,Your Lyft driver Ahmed is arriving in 2 minutes in a grey Toyota Camry.
+0,travel_link,Delta: your flight DL482 to Atlanta now departs from gate B12. Info: https://delta.com/fs
+0,pharmacy,CVS Pharmacy: your prescription is ready for pickup at the Main St store.
+0,bank_alert,Chase: your balance is below $100. Current balance $84.12. Reply STOP to opt out of alerts.
+0,bank_alert,Purchase of $23.50 at Target with your card ending 4421. Not you? Call the number on the back of your card.
+0,appointment,"Hi, this is Bella Salon confirming your haircut on Saturday at 11am. See you then!"
+0,personal,Can you pick up milk on the way home? and bread if they have the sourdough
+0,personal,"Mum I got home safe, thanks for dinner! Love you"
+0,personal,Did you see the game last night?? unbelievable ending
+0,work,"Meeting moved to 3:30, same room"
+0,utility,"Your water bill of $42.80 is due on the 15th. Autopay is on, no action needed."
+0,restaurant,Your table at Luigi's is ready! Please come to the host stand within 10 minutes.
+0,school,Lincoln Elementary: school will close at 1pm on Friday for staff training.
+0,delivery_link,Royal Mail: your parcel was delivered to your safe place. View photo: https://royalmail.com/p/8J2
+0,carrier,Verizon: you have used 80% of your data for this cycle. Your plan resets on the 12th.
+0,otp,Your Venmo code is 902114. Venmo will never call you to ask for it.
+0,personal,"Hey just landed, will call you once I get my bag"

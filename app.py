@@ -1,4 +1,5 @@
 import html
+import json
 import os
 import re
 
@@ -6,18 +7,42 @@ import streamlit as st
 from sentence_transformers import SentenceTransformer
 from xgboost import XGBClassifier
 
-from phishing_features import EMBEDDER_NAME, STRUCTURAL_FEATURE_NAMES, build_email_text, build_features
+from phishing_features import (
+    EMBEDDER_NAME, STRUCTURAL_FEATURE_NAMES, build_email_text, embedding_dimension, riskiest_windows,
+    threat_probabilities,
+)
 
 MODEL_DIR = os.environ.get('PHISHING_MODEL_DIR', 'trained_model')
 CHANNELS = {'Email': 'email', 'SMS': 'sms'}  # UI label -> channel name used by phishing_features
 CLASS_NAMES = {'Email': ('Safe Email', 'Phishing Email'), 'SMS': ('Safe SMS', 'Malicious SMS')}
-THREAT_THRESHOLD = 0.5
 REVIEW_THRESHOLD = 0.75
+
+
+def load_model_info():
+    """Read the settings the notebook saved and check they match phishing_features.py."""
+    path = os.path.join(MODEL_DIR, 'model_info.json')
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"'{path}' not found. Download it with the models from train_model.ipynb.")
+    with open(path) as f:
+        info = json.load(f)
+    if info['embedder'] != EMBEDDER_NAME:
+        raise ValueError(
+            f"The models were trained with the '{info['embedder']}' embedder but phishing_features.py uses "
+            f"'{EMBEDDER_NAME}'. Retrain with train_model.ipynb."
+        )
+    for channel in CHANNELS.values():
+        if info[channel]['structural_features'] != STRUCTURAL_FEATURE_NAMES[channel]:
+            raise ValueError(
+                f"The {channel} model was trained with structural features {info[channel]['structural_features']} "
+                f"but phishing_features.py builds {STRUCTURAL_FEATURE_NAMES[channel]}. Retrain with train_model.ipynb."
+            )
+    return info
 
 
 # Function to load the trained models and embedder
 @st.cache_resource
 def load_models():
+    info = load_model_info()
     embedder = SentenceTransformer(EMBEDDER_NAME)
     models = {}
     for channel in CHANNELS.values():
@@ -26,18 +51,14 @@ def load_models():
             raise FileNotFoundError(f"'{path}' not found. Train the models with train_model.ipynb first.")
         model = XGBClassifier()
         model.load_model(path)
-        expected_features = embedder.get_sentence_embedding_dimension() + len(STRUCTURAL_FEATURE_NAMES[channel])
+        expected_features = embedding_dimension(embedder) + len(STRUCTURAL_FEATURE_NAMES[channel])
         if model.n_features_in_ != expected_features:
             raise ValueError(
                 f'{channel} model expects {model.n_features_in_} features but phishing_features.py builds '
                 f'{expected_features}. Retrain with train_model.ipynb.'
             )
         models[channel] = model
-    return models, embedder
-
-
-def threat_probabilities(model, embedder, texts, channel):
-    return model.predict_proba(build_features(texts, embedder, channel))[:, 1]
+    return models, embedder, info
 
 
 # Page configuration
@@ -60,7 +81,7 @@ st.write("Enter a message or email below to analyze its probability of being a p
 
 # Load models and embedder
 try:
-    models, embedder = load_models()
+    models, embedder, model_info = load_models()
 except Exception as e:
     st.error(f"Error loading model: {e}")
     st.stop()
@@ -103,7 +124,18 @@ with result_container:
 
             # --- 1. PREDICT ---
             threat_prob = float(threat_probabilities(model, embedder, [user_input], channel)[0])
-            is_threat = threat_prob >= THREAT_THRESHOLD
+            scored_text = user_input  # the text the word highlighting explains
+
+            # Optional window scan: one suspicious passage can flag a long message (off when the threshold is None)
+            window_threshold = model_info[channel].get('window_threshold')
+            flagged_window = None
+            if window_threshold is not None:
+                window_probs, windows = riskiest_windows(model, embedder, [user_input], channel)
+                if window_probs[0] >= window_threshold and window_probs[0] > threat_prob:
+                    threat_prob, flagged_window = float(window_probs[0]), windows[0]
+                    scored_text = flagged_window
+
+            is_threat = threat_prob >= model_info['threshold']
             predicted_class_name = threat_name if is_threat else safe_name
             predicted_probability = threat_prob if is_threat else 1 - threat_prob
 
@@ -118,6 +150,9 @@ with result_container:
                 st.error(f"🚨 This message is flagged as a THREAT: {predicted_class_name}.")
             else:
                 st.success(f"✅ This message appears to be SAFE: {predicted_class_name}.")
+            if flagged_window:
+                # Windows are cleaned text (lowercase words and numbers only), so this can't inject markdown
+                st.info(f"Flagged because of this passage: \"{flagged_window}\"")
 
             # --- 3. EXPLAINABILITY FEATURE (XAI) ---
             st.write("### Analysis Breakdown:")
@@ -134,11 +169,12 @@ with result_container:
             </div>
             """, unsafe_allow_html=True)
 
-            # Importance = how much the predicted class's probability drops when the word is removed.
+            # Importance = how much the predicted class's probability drops when the word is removed
+            # from the scored text (the whole message, or the flagged passage).
             # All variants are scored in one batch instead of one embedding call per word.
-            unique_words = sorted({w.lower() for w in re.findall(r'\b\w+\b', user_input)})
+            unique_words = sorted({w.lower() for w in re.findall(r'\b\w+\b', scored_text)})
             variants = [
-                re.sub(r'\b' + re.escape(word) + r'\b', '', user_input, flags=re.IGNORECASE)
+                re.sub(r'\b' + re.escape(word) + r'\b', '', scored_text, flags=re.IGNORECASE)
                 for word in unique_words
             ]
             with st.spinner("Calculating word contributions..."):
